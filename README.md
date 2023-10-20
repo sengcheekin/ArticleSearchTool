@@ -1,2 +1,2 @@
-# NewsSummary
-Repo for a personal news summary NLP project
+# Article Search
+Repo for a personal Article Search NLP project
