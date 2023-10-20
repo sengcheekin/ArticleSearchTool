@@ -15,14 +15,7 @@ from langchain.document_loaders import UnstructuredURLLoader
 from langchain.vectorstores import FAISS
 from langchain.llms import GPT4All
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-
-st.title("News Summary")
-st.header("Enter the news article URLs below:")
-url = st.text_input("URL")
-st.header("Enter the question below:")
-question = st.text_input("Question")
-st.header("Summary:")
-
+from langchain.prompts import PromptTemplate
 
 loader = UnstructuredURLLoader(urls=[
     "https://www.octoparse.com/blog/how-to-scrape-news",
@@ -33,8 +26,8 @@ data = loader.load()
 
 r_splitter = RecursiveCharacterTextSplitter(
     separators = ["\n\n", "\n", " "],  # List of separators based on requirement (defaults to ["\n\n", "\n", " "])
-    chunk_size = 500,  # size of each chunk created
-    chunk_overlap  = 0,  # size of  overlap between chunks in order to maintain the context
+    chunk_size = 1000,  # size of each chunk created
+    chunk_overlap  = 100,  # size of  overlap between chunks in order to maintain the context
     length_function = len  # Function to calculate size, currently we are using "len" which denotes length of string however you can pass any token counter)
 )
 
@@ -60,7 +53,6 @@ local_path = "D:\Documents\Interview Prep\Code\GPT4All\orca-mini-3b.ggmlv3.q4_0.
 
 llm = GPT4All(model=local_path, callbacks=callbacks, verbose=True)
 
-from langchain.prompts import PromptTemplate
 
 prompt_template = """
 Given the following extracted parts of a long document and a question, create a final answer with references ("SOURCES"). If you don't know the answer, just say that you don't know, don't try to make up an answer.
@@ -89,3 +81,5 @@ query = "What is web scraping?"
 answer = chain({"question": query}, return_only_outputs=True)
 print(answer["answer"])
 print(answer["source_documents"][0].metadata["source"]) # workaround to get the source, as langchain.RetrievalQAWithSourcesChain does not return the source properly.
+
+
