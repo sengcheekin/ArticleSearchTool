@@ -1,16 +1,10 @@
 import os
 import streamlit as st
 import pickle
-# import langchain
-# import json
-# import requests
-# from langchain import OpenAI
-# from langchain.embeddings import OpenAIEmbeddings
 from langchain.chains import RetrievalQAWithSourcesChain
 from langchain.chains.qa_with_sources.loading import load_qa_with_sources_chain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-# from langchain.embeddings import OpenAIEmbeddings
-from langchain.embeddings import HuggingFaceEmbeddings, SentenceTransformerEmbeddings
+from langchain.embeddings import SentenceTransformerEmbeddings
 from langchain.document_loaders import UnstructuredURLLoader
 from langchain.vectorstores import FAISS
 from langchain.llms import GPT4All
@@ -35,17 +29,17 @@ docs = r_splitter.split_documents(data)
 
 embeddings = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
 
-vectorindex_openai = FAISS.from_documents(docs, embeddings)
+vector_index = FAISS.from_documents(docs, embeddings)
 
-file_path = "vector_index.pkl"
-with open(file_path, "wb") as f:
-  pickle.dump(vectorindex_openai, f)
+# file_path = "vector_index.pkl"
+# with open(file_path, "wb") as f:
+#   pickle.dump(vector_index, f)
 
-file_path = "vector_index.pkl"
+# file_path = "vector_index.pkl"
 
-if os.path.exists(file_path):
-    with open(file_path, "rb") as f:
-        vectorIndex = pickle.load(f)
+# if os.path.exists(file_path):
+#     with open(file_path, "rb") as f:
+#         vector_index = pickle.load(f)
 
 callbacks=[StreamingStdOutCallbackHandler()]
 
@@ -74,7 +68,7 @@ PROMPT = PromptTemplate(
 )
 
 chain_type_kwargs = {"prompt": PROMPT, "document_prompt": DOC_PROMPT }
-chain = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff",retriever=vectorIndex.as_retriever(),chain_type_kwargs=chain_type_kwargs,return_source_documents=True,verbose=True)
+chain = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type="stuff",retriever=vector_index.as_retriever(),chain_type_kwargs=chain_type_kwargs,return_source_documents=True,verbose=True)
 
 query = "What is web scraping?"
 
